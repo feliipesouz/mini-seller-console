@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useReducer } from 'react';
-import type { Lead, Opportunity } from '../domain/types';
+import type { Lead, LeadStatus, Opportunity } from '../domain/types';
 import * as api from '../services/mockApi';
+import { getErrorMessage } from '../domain/errors';
 
 type State = {
   leads: Lead[];
@@ -22,7 +23,7 @@ type Action =
   | { type: 'LOAD_ERROR'; payload: string }
   | { type: 'SELECT_LEAD'; payload?: Lead }
   | { type: 'SET_SEARCH'; payload: string }
-  | { type: 'SET_STATUS_FILTER'; payload: 'all' | string }
+  | { type: 'SET_STATUS_FILTER'; payload: 'all' | LeadStatus }
   | { type: 'SET_SORT_SCORE_DESC'; payload: boolean }
   | { type: 'SAVE_START' }
   | { type: 'SAVE_SUCCESS'; payload: Lead }
@@ -84,13 +85,13 @@ export function LeadsProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       try {
         dispatch({ type: 'LOAD_START' });
-        const [leads, opportunities] = await Promise.all([
-          api.getLeads(),
-          api.getOpportunities(),
-        ]);
+        const [leads, opportunities] = await Promise.all([api.getLeads(), api.getOpportunities()]);
         dispatch({ type: 'LOAD_SUCCESS', payload: { leads, opportunities } });
-      } catch (e: any) {
-        dispatch({ type: 'LOAD_ERROR', payload: e.message ?? 'Erro ao carregar' });
+      } catch (e: unknown) {
+        dispatch({
+          type: 'LOAD_ERROR',
+          payload: getErrorMessage(e, 'Erro ao carregar'),
+        });
       }
     })();
   }, []);
@@ -98,8 +99,8 @@ export function LeadsProvider({ children }: { children: React.ReactNode }) {
   return <Ctx.Provider value={{ state, dispatch }}>{children}</Ctx.Provider>;
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-export function useLeads() {
+
+export function UseLeads() {
   const ctx = useContext(Ctx);
   if (!ctx) throw new Error('useLeads must be used within LeadsProvider');
   return ctx;
