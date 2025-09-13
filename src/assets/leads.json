@@ -1,0 +1,20 @@
+[
+  {
+    "id": "L-001",
+    "name": "John Doe",
+    "company": "Acme Corp",
+    "email": "john@acme.com",
+    "source": "Website",
+    "score": 92,
+    "status": "new"
+  },
+  {
+    "id": "L-002",
+    "name": "Jane Smith",
+    "company": "Globex",
+    "email": "jane@globex.com",
+    "source": "Referral",
+    "score": 86,
+    "status": "contacted"
+  }
+]
