@@ -1,69 +1,76 @@
-# React + TypeScript + Vite
+````markdown
+# Mini Seller Console
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Triage **Leads** and convert them into **Opportunities**.  
+Built with **React + TypeScript + Vite + Tailwind (v4)**. No backend required — data is seeded from a local JSON and persisted to `localStorage` with simulated latency and failures.
 
-Currently, two official plugins are available:
+**Live demo:** https://mini-seller-console-rouge.vercel.app/  
+**Repository:** https://github.com/feliipesouz/mini-seller-console
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### MVP
+- Leads list loaded from `src/assets/leads.json`.
+- Columns: `id`, `name`, `company`, `email`, `source`, `score`, `status`.
+- Search by **name/company**, filter by **status**, sort by **score (desc)**.
+- **Lead Detail Panel** (slide-over):
+  - Inline edit of **email** (with format validation) and **status**.
+  - Save / Cancel with basic error handling.
+- **Convert to Opportunity** from the detail panel.
+- Opportunities table: `name`, `stage`, `amount?`, `accountName`.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Nice-to-haves implemented
+- **Optimistic updates** with rollback on simulated failure.
+- (Optional in code) **Persist** toolbar state (search/filter/sort) to `localStorage`.
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Performance
+- Smooth with ~100 leads (selectors are pure and memoizable).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## Tech Stack
+- **React 19**, **TypeScript 5**, **Vite 7** (`@vitejs/plugin-react-swc`)
+- **Tailwind CSS v4** via `@tailwindcss/vite` (no PostCSS config)
+- State: **Context + useReducer**
+- Tooling: **ESLint** + TypeScript rules
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js **>= 18**
+- **pnpm** (recommended)
+
+### Install & Run
+```bash
+pnpm install
+pnpm dev
+# App at http://localhost:5173
+````
+
+### Production Build
+
+```bash
+pnpm build
+pnpm preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Lint
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm lint
 ```
+
+---
+
+## UX States
+
+* **Loading:** spinner/skeleton while fetching leads/opportunities.
+* **Empty:** (a) no leads seeded or (b) no results after search/filter.
+* **Error:** banner with message and retry.
+* **Saving:** disables Save button; optimistic UI available.
+* **Slide-over overlay:** click outside closes the panel.
+
