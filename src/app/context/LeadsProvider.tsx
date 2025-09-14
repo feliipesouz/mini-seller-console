@@ -1,34 +1,7 @@
-import React, { createContext, useContext, useEffect, useReducer } from 'react';
-import type { Lead, LeadStatus, Opportunity } from '../domain/types';
-import * as api from '../services/mockApi';
+import React, { useEffect, useReducer } from 'react';
+import { LeadsCtx, type Action, type State } from './leadsContext';
 import { getErrorMessage } from '../domain/errors';
-
-type State = {
-  leads: Lead[];
-  opportunities: Opportunity[];
-  loading: boolean;
-  error?: string;
-  ui: {
-    search: string;
-    statusFilter: 'all' | string;
-    sortByScoreDesc: boolean;
-    selectedLead?: Lead;
-    saving: boolean;
-  };
-};
-
-type Action =
-  | { type: 'LOAD_START' }
-  | { type: 'LOAD_SUCCESS'; payload: { leads: Lead[]; opportunities: Opportunity[] } }
-  | { type: 'LOAD_ERROR'; payload: string }
-  | { type: 'SELECT_LEAD'; payload?: Lead }
-  | { type: 'SET_SEARCH'; payload: string }
-  | { type: 'SET_STATUS_FILTER'; payload: 'all' | LeadStatus }
-  | { type: 'SET_SORT_SCORE_DESC'; payload: boolean }
-  | { type: 'SAVE_START' }
-  | { type: 'SAVE_SUCCESS'; payload: Lead }
-  | { type: 'SAVE_ERROR'; payload: string }
-  | { type: 'CONVERT_SUCCESS'; payload: Opportunity };
+import * as api from '../services/mockApi';
 
 const initial: State = {
   leads: [],
@@ -42,13 +15,7 @@ function reducer(state: State, action: Action): State {
     case 'LOAD_START':
       return { ...state, loading: true, error: undefined };
     case 'LOAD_SUCCESS':
-      return {
-        ...state,
-        loading: false,
-        error: undefined,
-        leads: action.payload.leads,
-        opportunities: action.payload.opportunities,
-      };
+      return { ...state, loading: false, error: undefined, ...action.payload };
     case 'LOAD_ERROR':
       return { ...state, loading: false, error: action.payload };
     case 'SELECT_LEAD':
@@ -64,8 +31,12 @@ function reducer(state: State, action: Action): State {
     case 'SAVE_SUCCESS':
       return {
         ...state,
-        leads: state.leads.map((l) => (l.id === action.payload.id ? action.payload : l)),
-        ui: { ...state.ui, saving: false, selectedLead: action.payload },
+        leads: state.leads.map(l => (l.id === action.payload.id ? action.payload : l)),
+        ui: {
+          ...state.ui,
+          saving: false,
+          selectedLead: action.meta?.closePanel ? undefined : action.payload,
+        },
       };
     case 'SAVE_ERROR':
       return { ...state, ui: { ...state.ui, saving: false }, error: action.payload };
@@ -75,8 +46,6 @@ function reducer(state: State, action: Action): State {
       return state;
   }
 }
-
-const Ctx = createContext<{ state: State; dispatch: React.Dispatch<Action> } | null>(null);
 
 export function LeadsProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initial);
@@ -88,20 +57,10 @@ export function LeadsProvider({ children }: { children: React.ReactNode }) {
         const [leads, opportunities] = await Promise.all([api.getLeads(), api.getOpportunities()]);
         dispatch({ type: 'LOAD_SUCCESS', payload: { leads, opportunities } });
       } catch (e: unknown) {
-        dispatch({
-          type: 'LOAD_ERROR',
-          payload: getErrorMessage(e, 'Erro ao carregar'),
-        });
+        dispatch({ type: 'LOAD_ERROR', payload: getErrorMessage(e, 'Erro ao carregar') });
       }
     })();
   }, []);
 
-  return <Ctx.Provider value={{ state, dispatch }}>{children}</Ctx.Provider>;
-}
-
-
-export function UseLeads() {
-  const ctx = useContext(Ctx);
-  if (!ctx) throw new Error('useLeads must be used within LeadsProvider');
-  return ctx;
+  return <LeadsCtx.Provider value={{ state, dispatch }}>{children}</LeadsCtx.Provider>;
 }

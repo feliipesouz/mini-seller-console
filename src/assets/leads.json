@@ -16,5 +16,77 @@
     "source": "Referral",
     "score": 86,
     "status": "contacted"
+  },
+  {
+    "id": "L-003",
+    "name": "Carlos Mendes",
+    "company": "Initech",
+    "email": "carlos@initech.com",
+    "source": "LinkedIn",
+    "score": 74,
+    "status": "qualified"
+  },
+  {
+    "id": "L-004",
+    "name": "Aline Costa",
+    "company": "Umbrella",
+    "email": "aline@umbrella.co",
+    "source": "Website",
+    "score": 58,
+    "status": "new"
+  },
+  {
+    "id": "L-005",
+    "name": "Marcos Vieira",
+    "company": "Soylent",
+    "email": "marcos@soylent.com",
+    "source": "Event",
+    "score": 67,
+    "status": "contacted"
+  },
+  {
+    "id": "L-006",
+    "name": "Emily Clark",
+    "company": "Stark Industries",
+    "email": "emily@stark.com",
+    "source": "Email Campaign",
+    "score": 81,
+    "status": "qualified"
+  },
+  {
+    "id": "L-007",
+    "name": "Rafael Lima",
+    "company": "Wayne Enterprises",
+    "email": "rafael@wayne.com",
+    "source": "Cold Call",
+    "score": 45,
+    "status": "unqualified"
+  },
+  {
+    "id": "L-008",
+    "name": "Sofia Almeida",
+    "company": "Hooli",
+    "email": "sofia@hooli.com",
+    "source": "Partner",
+    "score": 69,
+    "status": "contacted"
+  },
+  {
+    "id": "L-009",
+    "name": "Peter Johnson",
+    "company": "Ingram Micro",
+    "email": "peter@ingrammicro.com",
+    "source": "Ad",
+    "score": 95,
+    "status": "qualified"
+  },
+  {
+    "id": "L-010",
+    "name": "Laura Martins",
+    "company": "Probas Corp",
+    "email": "laura@probas.com",
+    "source": "Webinar",
+    "score": 53,
+    "status": "new"
   }
 ]

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { isValidEmail } from '../domain/validators';
-import { UseLeads } from '../context/LeadsProvider';
 import { updateLead, convertLeadToOpportunity } from '../services/mockApi';
 import { getErrorMessage } from '../domain/errors';
 import type { Lead, LeadStatus } from '../domain/types';
+import { useLeads } from '../context/useLeads';
 
 export default function LeadDetailPanel() {
-  const { state, dispatch } = UseLeads();
+  const { state, dispatch } = useLeads();
   const lead = state.ui.selectedLead;
 
   const [email, setEmail] = useState('');
@@ -49,12 +49,18 @@ export default function LeadDetailPanel() {
       status: currentLead.status,
     };
 
+    const statusChanged = status !== currentLead.status;
+
     dispatch({ type: 'SAVE_START' });
     try {
       const res = await updateLead(updated);
-      dispatch({ type: 'SAVE_SUCCESS', payload: res });
+      dispatch({
+        type: 'SAVE_SUCCESS',
+        payload: res,
+        meta: { closePanel: statusChanged },
+      });
     } catch (e: unknown) {
-      dispatch({ type: 'SAVE_SUCCESS', payload: snapshot });
+      dispatch({ type: 'SAVE_SUCCESS', payload: snapshot, meta: { closePanel: false } });
       dispatch({ type: 'SAVE_ERROR', payload: getErrorMessage(e, 'Falha ao salvar') });
       alert('Falha ao salvar (simulado). Alterações revertidas.');
     }
@@ -64,6 +70,7 @@ export default function LeadDetailPanel() {
     try {
       const opp = await convertLeadToOpportunity(currentLead);
       dispatch({ type: 'CONVERT_SUCCESS', payload: opp });
+      dispatch({ type: 'SELECT_LEAD', payload: undefined });
       alert('Lead convertido em Opportunity!');
     } catch (e: unknown) {
       alert(`Falha ao converter (simulado). ${getErrorMessage(e)}`);
@@ -80,7 +87,7 @@ export default function LeadDetailPanel() {
         <header className="flex items-center justify-between">
           <h2 className="text-lg font-medium">{lead.name}</h2>
           <button
-            className="text-sm text-gray-500"
+            className="text-sm text-gray-500 cursor-pointer"
             onClick={() => dispatch({ type: 'SELECT_LEAD', payload: undefined })}
           >
             Close
@@ -101,7 +108,7 @@ export default function LeadDetailPanel() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Status</label>
+            <label className="block text-sm font-medium">All Status</label>
             <select
               className="mt-1 w-full border rounded-md px-3 py-2"
               value={status}
@@ -119,20 +126,20 @@ export default function LeadDetailPanel() {
 
         <div className="mt-auto flex items-center gap-2">
           <button
-            className="px-3 py-2 rounded-md border"
+            className="px-3 py-2 cursor-pointer rounded-md border"
             onClick={() => dispatch({ type: 'SELECT_LEAD', payload: undefined })}
           >
             Cancel
           </button>
           <button
-            className="px-3 py-2 rounded-md bg-indigo-600 text-white disabled:opacity-50"
+            className="px-3 py-2 cursor-pointer rounded-md bg-indigo-600 text-white disabled:opacity-50"
             onClick={onSave}
             disabled={!canSave}
           >
             {state.ui.saving ? 'Saving…' : 'Save'}
           </button>
           <button
-            className="ml-auto px-3 py-2 rounded-md bg-emerald-600 text-white"
+            className="ml-auto px-3 py-2 cursor-pointer rounded-md bg-emerald-600 text-white"
             onClick={onConvert}
           >
             Convert Lead

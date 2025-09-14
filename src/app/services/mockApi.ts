@@ -4,7 +4,6 @@ import type { Lead, LeadStatus, Opportunity } from '../domain/types';
 const LS_LEADS = 'leads';
 const LS_OPPS = 'opportunities';
 
-
 function normalizeStatus(s: string | undefined): LeadStatus {
   const v = String(s ?? 'new').toLowerCase();
   const allowed: LeadStatus[] = ['new', 'contacted', 'qualified', 'unqualified'];
