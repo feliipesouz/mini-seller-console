@@ -2,6 +2,7 @@ import Toolbar from './app/components/Toolbar';
 import LeadsTable from './app/components/LeadsTable';
 import OpportunitiesTable from './app/components/OpportunitiesTable';
 import { UseLeads } from './app/context/LeadsProvider';
+import LeadDetailPanel from './app/components/LeadDetailPanel';
 
 export default function App() {
   const { state } = UseLeads();
@@ -19,6 +20,8 @@ export default function App() {
         <LeadsTable />
         <OpportunitiesTable />
       </main>
+
+      <LeadDetailPanel />
     </div>
   );
 }
